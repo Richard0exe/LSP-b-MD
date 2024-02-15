@@ -1,0 +1,23 @@
+VARDS Dels
+TEVS Tevs
+MATE Mate
+
+VARDS Tevs
+MATE Vecmate
+
+VARDS CitsDels
+MATE CitaMate
+TEVS CitsTevs
+
+VARDS Vecmate
+TEVS Vecvectevs
+MATE Vecvecmate
+
+VARDS Ricards
+TEVS Alberts
+MATE Marina
+
+VARDS Jana
+MATE Marina
+TEVS Alberts
+
