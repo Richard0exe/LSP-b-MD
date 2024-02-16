@@ -1,3 +1,7 @@
+VARDS Vecmate
+TEVS Vecvectevs
+MATE Vecvecmate
+
 VARDS Dels
 TEVS Tevs
 MATE Mate
@@ -9,10 +13,6 @@ VARDS CitsDels
 MATE CitaMate
 TEVS CitsTevs
 
-VARDS Vecmate
-TEVS Vecvectevs
-MATE Vecvecmate
-
 VARDS Ricards
 TEVS Alberts
 MATE Marina
@@ -20,4 +20,17 @@ MATE Marina
 VARDS Jana
 MATE Marina
 TEVS Alberts
+
+VARDS Arturs
+MATE Daiga
+TEVS Juris
+
+VARDS Aleks
+MATE Kristine
+TEVS Juris
+
+VARDS Aleks
+MATE Kristine
+TEVS Juris
+
 

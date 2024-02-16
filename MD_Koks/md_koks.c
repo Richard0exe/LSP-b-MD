@@ -57,26 +57,40 @@ void printFamily(t_node* nodeArray[], int numNodes, int family) {
 }
 
 void printNodes(t_node* nodeArray[], int numNodes) {
-    int maxFamily = 0;
     for (int i = 0; i < numNodes; i++) {
-        if (nodeArray[i]->family > maxFamily) {
-            maxFamily = nodeArray[i]->family;
-        }
-    }
-    for (int family = 1; family <= maxFamily; family++) {
-        printFamily(nodeArray, numNodes, family);
+       printf("Name: %s, Generation: %d, Family: %d, Mother: %s, Father: %s\n", 
+              nodeArray[i]->name, 
+              nodeArray[i]->generation, 
+              nodeArray[i]->family,
+              nodeArray[i]->mom ? nodeArray[i]->mom->name : "Unknown",
+              nodeArray[i]->dad ? nodeArray[i]->dad->name : "Unknown");
     }
 }
 
-void dfs(t_node* startNode, int family) {
-    if (startNode == NULL || startNode->family != 0) return; // Already visited or belongs to another family
+void dfs(t_node* node, int family) {
+    // If the node is NULL or already visited, return
+    if (node == NULL || node->family != 0) {
+        return;
+    }
 
-    startNode->family = family; // Mark the node as visited and assign it to the current family
+    // Assign the current family to the node
+    node->family = family;
 
-    // Recursive DFS on mom and dad nodes
-    dfs(startNode->mom, family);
-    dfs(startNode->dad, family);
+    // If the node has a parent and the parent has a family
+    if (node->mom && node->mom->family != 0) {
+        // Assign the parent's family to the node
+        node->family = node->mom->family;
+    }
+    else if (node->dad && node->dad->family != 0) {
+        // Assign the parent's family to the node
+        node->family = node->dad->family;
+    }
+
+    // Recursively call dfs on the node's parents
+    dfs(node->mom, family);
+    dfs(node->dad, family);
 }
+
 
 void separateFamilies(t_node* nodeArray[], int numNodes) {
     int currentFamily = 1;
@@ -85,26 +99,11 @@ void separateFamilies(t_node* nodeArray[], int numNodes) {
         if (nodeArray[i]->family == 0) {
             // Perform DFS from unvisited nodes to identify the family
             dfs(nodeArray[i], currentFamily);
-
-            // Check if the parent nodes belong to the same family
-            if (nodeArray[i]->mom != NULL && nodeArray[i]->mom->family != currentFamily) {
-                // Assign the family number of the parent node to the current node
-                nodeArray[i]->family = nodeArray[i]->mom->family;
-
-                // Recursively update the family numbers of the parent nodes
-                separateFamilies(nodeArray, numNodes);
-            } else if (nodeArray[i]->dad != NULL && nodeArray[i]->dad->family != currentFamily) {
-                // Assign the family number of the parent node to the current node
-                nodeArray[i]->family = nodeArray[i]->dad->family;
-
-                // Recursively update the family numbers of the parent nodes
-                separateFamilies(nodeArray, numNodes);
-            }
-
             currentFamily++;
         }
     }
 }
+
 
 
 void updateGenerations(t_node* node) {
@@ -132,10 +131,7 @@ t_node* findNodeByName(t_node* nodeArray[], int numNodes, const char* name) {
 }
 
 void addFather(t_node* currentNode, t_node* fatherNode) {
-    if (currentNode->dad != NULL) {
-        fprintf(stdout, "Kļūda: 2 tēvi nav atļauti.\n");
-        exit(1);
-    }
+
     if (fatherNode->dad == currentNode || fatherNode->mom == currentNode) {
         fprintf(stdout, "Kļūda: cikliskas attiecības.\n");
         exit(1);
@@ -145,10 +141,7 @@ void addFather(t_node* currentNode, t_node* fatherNode) {
 }
 
 void addMother(t_node* currentNode, t_node* motherNode) {
-    if (currentNode->mom != NULL) {
-        fprintf(stdout, "Kļūda: 2 mātes nav atļautas.\n");
-        exit(1);
-    }
+
     if (motherNode->dad == currentNode || motherNode->mom == currentNode) {
         fprintf(stdout, "Kļūda: cikliskas attiecības.\n");
         exit(1);
@@ -252,6 +245,7 @@ t_node* currentNode;
  
 
 separateFamilies(nodeArray, numNodes);
+
 printNodes(nodeArray, numNodes);   
 
    freeMemory(nodeArray, numNodes);
