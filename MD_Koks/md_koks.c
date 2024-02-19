@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define MAX_LINE_LENGTH 63
+#define MAX_NODES 10000
 
 typedef struct node
 {
@@ -11,6 +13,7 @@ typedef struct node
     struct node *mom; // left
     struct node *dad; // right
     int family;
+    bool visited;
 
 } t_node;
 
@@ -31,6 +34,44 @@ t_node *createNode(char *name)
     return newNode;
 }
 
+bool dfs(t_node *node, t_node *visitedNodes[], int numVisitedNodes)
+{
+    if (node == NULL)
+        return false;
+
+    if (node->visited)
+        return true;
+
+    node->visited = true;
+
+    visitedNodes[numVisitedNodes++] = node;
+
+    if (dfs(node->mom, visitedNodes, numVisitedNodes))
+        return true;
+
+    if (dfs(node->dad, visitedNodes, numVisitedNodes))
+        return true;
+
+    visitedNodes[--numVisitedNodes] = NULL;
+
+    node->visited = false;
+
+    return false;
+}
+
+void detectCycle(t_node *nodeArray[], int numNodes)
+{
+    for (int i = 0; i < numNodes; i++)
+    {
+        t_node *visitedNodes[MAX_NODES] = {NULL};
+        if (dfs(nodeArray[i], visitedNodes, 0))
+        {
+            fprintf(stdout, "Atrasts cikls!\n");
+            exit(1);
+        }
+    }
+}
+
 void freeMemory(t_node *nodeArray[], int numNodes)
 {
     for (int i = 0; i < numNodes; i++)
@@ -43,6 +84,7 @@ void freeMemory(t_node *nodeArray[], int numNodes)
 void printFamily(t_node *nodeArray[], int numNodes, int family)
 {
     // Find the maximum generation within the family
+    int lastFamily = 0;
     int maxGeneration = 0;
     for (int i = 0; i < numNodes; i++)
     {
@@ -59,53 +101,12 @@ void printFamily(t_node *nodeArray[], int numNodes, int family)
         {
             if (nodeArray[i]->family == family && nodeArray[i]->generation == generation)
             {
-                printf("%s\n", nodeArray[i]->name);
+                fprintf(stdout, "%s\n", nodeArray[i]->name);
             }
         }
     }
-    printf("\n");
+    fprintf(stdout, "\n");
 }
-
-void printNodes(t_node *nodeArray[], int numNodes)
-{
-    for (int i = 0; i < numNodes; i++)
-    {
-        printf("Name: %s, Generation: %d, Family: %d, Mother: %s, Father: %s\n",
-               nodeArray[i]->name,
-               nodeArray[i]->generation,
-               nodeArray[i]->family,
-               nodeArray[i]->mom ? nodeArray[i]->mom->name : "Unknown",
-               nodeArray[i]->dad ? nodeArray[i]->dad->name : "Unknown");
-    }
-}
-
-// void dfs(t_node *node, int family)
-// {
-//     // If the node is NULL or already visited, return
-//     if (node == NULL || node->family != 0)
-//     {
-//         return;
-//     }
-
-//     // Assign the current family to the node
-//     node->family = family;
-
-//     // If the node has a parent and the parent has a family
-//     if (node->mom && node->mom->family != 0)
-//     {
-//         // Assign the parent's family to the node
-//         node->family = node->mom->family;
-//     }
-//     else if (node->dad && node->dad->family != 0)
-//     {
-//         // Assign the parent's family to the node
-//         node->family = node->dad->family;
-//     }
-
-//     // Recursively call dfs on the node's parents
-//     dfs(node->mom, family);
-//     dfs(node->dad, family);
-// }
 
 int findFamily(t_node *node)
 {
@@ -135,7 +136,7 @@ int findFamily(t_node *node)
 
 void setFamily(t_node *node, int family)
 {
-    if (node == NULL || node->family != 0)
+    if (node == NULL || family == node->family)
     {
         return;
     }
@@ -200,24 +201,11 @@ t_node *findNodeByName(t_node *nodeArray[], int numNodes, const char *name)
 
 void addFather(t_node *currentNode, t_node *fatherNode)
 {
-
-    if (fatherNode->dad == currentNode || fatherNode->mom == currentNode)
-    {
-        fprintf(stdout, "Kļūda: cikliskas attiecības.\n");
-        exit(1);
-    }
-
     currentNode->dad = fatherNode;
 }
 
 void addMother(t_node *currentNode, t_node *motherNode)
 {
-
-    if (motherNode->dad == currentNode || motherNode->mom == currentNode)
-    {
-        fprintf(stdout, "Kļūda: cikliskas attiecības.\n");
-        exit(1);
-    }
 
     currentNode->mom = motherNode;
 }
@@ -229,7 +217,7 @@ int main()
     char *father = NULL;
     char *mother = NULL;
 
-    t_node *nodeArray[10000]; // Array to store pointers to created nodes
+    t_node *nodeArray[MAX_NODES]; // Array to store pointers to created nodes
     int numNodes = 0;
 
     while (fgets(line, MAX_LINE_LENGTH, stdin) != NULL)
@@ -326,6 +314,12 @@ int main()
         }
     }
 
+    // Check for cycles in the family tree
+
+    detectCycle(nodeArray, numNodes);
+
+    // Update generations for each node
+
     for (int i = 0; i < numNodes; i++)
     {
         if (nodeArray[i]->generation == 0)
@@ -336,7 +330,20 @@ int main()
 
     separateFamilies(nodeArray, numNodes);
 
-    printNodes(nodeArray, numNodes);
+    int maxFamily = 0;
+    for (int i = 0; i < numNodes; i++)
+    {
+        if (nodeArray[i]->family > maxFamily)
+        {
+            maxFamily = nodeArray[i]->family;
+        }
+    }
+
+    // Iterate over each family and print its members
+    for (int family = 1; family <= maxFamily; family++)
+    {
+        printFamily(nodeArray, numNodes, family);
+    }
 
     freeMemory(nodeArray, numNodes);
 

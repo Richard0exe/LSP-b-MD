@@ -1,7 +1,3 @@
-VARDS Vecmate
-TEVS Vecvectevs
-MATE Vecvecmate
-
 VARDS Dels
 TEVS Tevs
 MATE Mate
@@ -33,4 +29,7 @@ VARDS Aleks
 MATE Kristine
 TEVS Juris
 
+VARDS Vecmate
+TEVS Vecvectevs
+MATE Vecvecmate
 

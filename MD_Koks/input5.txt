@@ -1,0 +1,11 @@
+VARDS Ricards
+TEVS Alberts
+MATE Marina
+
+VARDS Alberts
+TEVS Janis
+
+VARDS Janis
+MATE Ricards
+
+
